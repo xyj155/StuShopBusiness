@@ -1,0 +1,144 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'com.mob.sdk'
+MobSDK {
+    appKey "29cbff9d24b0b"
+    appSecret "83fe8985b2647f0041f9cfb3487492d6"
+    SMSSDK {}
+    ShareSDK {
+        devInfo {
+            SinaWeibo {
+                appKey "568898243"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+                callbackUri "http://www.sharesdk.cn"
+            }
+            TencentWeibo {
+                appKey "801307650"
+                appSecret "ae36f4ee3946e1cbb98d6965b0b2ff5c"
+                callbackUri "http://www.sharesdk.cn"
+            }
+            ShortMessage {}
+            Wechat {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+                userName "gh_afb25ac019c9"
+                path "pages/index/index.html?id=1"
+                withShareTicket true
+                miniprogramType 2
+            }
+            QQ {
+                appId "100371282"
+                appKey "aed9b0303e3ed1e27bae87c33761161d"
+            }
+            Douyin {}
+            WechatMoments {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+            }
+            WechatFavorite {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+            }
+        }
+    }
+}
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        multiDexEnabled true
+        applicationId "com.example.stushopbusiness"
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+        packagingOptions {
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/rxjava.properties'
+            exclude 'META-INF/NOTICE.txt'
+        }
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a', 'mips', 'mips64'
+        }
+        flavorDimensions "default"
+    }
+
+    productFlavors {
+        baidu {
+            manifestPlaceholders = [
+                    JPUSH_PKGNAME: "com.example.stushopbusiness",
+                    JPUSH_CHANNEL: "baidu",
+                    JPUSH_APPKEY : "3a23b8ad0545565bb6d71ecc"
+            ]
+        }
+        yinyongbao {
+            manifestPlaceholders = [JPUSH_PKGNAME: "com.example.stushopbusiness",
+                                    JPUSH_CHANNEL: "yinyongbao",
+                                    JPUSH_APPKEY : "3a23b8ad0545565bb6d71ecc"]
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    implementation 'com.alibaba:arouter-api:1.4.1'
+    annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
+    implementation rootProject.ext.dependencies["appcompat-v7"]
+    api rootProject.ext.dependencies["BaseRecyclerViewAdapterHelper"]
+    api rootProject.ext.dependencies["support-v4"]
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    api rootProject.ext.dependencies["SmartRefreshLayout"]
+    //没有使用特殊Header，可以不加这行
+    implementation rootProject.ext.dependencies["arouter-api"]
+    annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
+    testImplementation 'junit:junit:4.12'
+    api rootProject.ext.dependencies["gson"]
+    api rootProject.ext.dependencies["MagicIndicator"]
+    api rootProject.ext.dependencies["rxjava"]
+    api rootProject.ext.dependencies["rxandroid"]
+    api rootProject.ext.dependencies["rxrelay"]
+    api rootProject.ext.dependencies["retrofit"]
+    api rootProject.ext.dependencies["retrofit2-rxjava2-adapter"]
+    api rootProject.ext.dependencies["converter-gson"]
+    api rootProject.ext.dependencies["adapter-rxjava"]
+    api rootProject.ext.dependencies["glide"]
+    api(name: 'epay-sdk-3.3.6', ext: 'aar')
+    api rootProject.ext.dependencies["logging-interceptor"]
+    api 'com.jakewharton:butterknife:8.6.0'
+    api rootProject.ext.dependencies["MZBannerView"]
+    api rootProject.ext.dependencies["marqueelibrary"]
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
+    api rootProject.ext.dependencies["bubblelayout"]
+    api rootProject.ext.dependencies["recyclerview-v7"]
+    api rootProject.ext.dependencies["cardview"]
+    api rootProject.ext.dependencies["design"]
+    api rootProject.ext.dependencies["multidex"]
+    api rootProject.ext.dependencies["android-gif-drawable"]
+    api rootProject.ext.dependencies["crashreport_upgrade"]
+    api rootProject.ext.dependencies["nativecrashreport"]
+    api rootProject.ext.dependencies["jmessage"]
+    api rootProject.ext.dependencies["jpush"]  // 此处以JPush 3.1.6 版本为例。
+    api rootProject.ext.dependencies["jcore"]  // 此处以JCore 1.2.5 版本为例。
+    api project(':pictureSelector')
+}
