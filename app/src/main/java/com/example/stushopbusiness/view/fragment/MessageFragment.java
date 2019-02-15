@@ -53,7 +53,7 @@ public class MessageFragment extends BaseFragment<EmptyPresenter> {
 //                Log.i(TAG, "gotResult: " + s);
 //                if (i == 0) {
                     List<Conversation> conversationList = JMessageClient.getConversationList();
-                    if (conversationList.size()!=0||conversationList!=null){
+                    if (conversationList!=null){
                         Log.i(TAG, "gotResult: " + conversationList.size());
                         conversationAdapter.replaceData(conversationList);
                     }

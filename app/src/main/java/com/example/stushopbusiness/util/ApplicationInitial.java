@@ -116,7 +116,7 @@ public class ApplicationInitial {
             }
 
         };
-        Bugly.init(MyApp.getInstance(), "090ab44906", false);
+        Bugly.init(MyApp.getInstance(), "b705191993", false);
 
         return this;
     }

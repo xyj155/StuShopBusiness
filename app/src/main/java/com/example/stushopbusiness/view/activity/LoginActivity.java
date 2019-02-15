@@ -105,7 +105,6 @@ public class LoginActivity extends BaseActivity<LoginContract.View, LoginPresent
         Map<String, Object> user = new HashMap<>();
         user.put("username", userGson.getUsername());
         user.put("shopicon", userGson.getShopIcon());
-        user.put("shopicon", userGson.getShopIcon());
         user.put("shopname", userGson.getShopName());
         user.put("userId", String.valueOf(userGson.getId()));
         user.put("owner", userGson.getShopOwner());

@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.example.stushopbusiness.R;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 
 public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected T mPresenter;
@@ -29,13 +32,12 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
 
 
-    public BaseFragment createDialog(String msgStr) {
+    public BaseFragment createDialog() {
         progressDialog = new Dialog(getActivity(), R.style.progress_dialog);
         progressDialog.setContentView(R.layout.base_dialog);
 
         progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView msg = (TextView) progressDialog.findViewById(R.id.id_tv_loadingmsg);
-        msg.setText(msgStr);
         progressDialog.show();
         return this;
     }
@@ -87,13 +89,14 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
      * 运行在onCreate之后
      * 生成view视图
      */
+    Unbinder unbinder;
     private ViewGroup viewGroup;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View inflate = inflater.inflate(initLayout(), container, false);
-
+        unbinder = ButterKnife.bind(this, inflate);
         this.viewGroup = container;
         initView(inflate);
         initData();
@@ -104,7 +107,11 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
         return viewGroup;
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
     public abstract int initLayout();
 

@@ -151,6 +151,7 @@ public class ShopServiceConversationActivity extends BaseActivity<EmptyContract.
     @Override
     public void initView() {
         createDialog();
+        JMessageClient.registerEventReceiver(this);
         ButterKnife.bind(this);
         initToolBar().setToolBarTitle(getIntent().getStringExtra("shopName"));
         mPanelRoot.setIgnoreRecommendHeight(true);

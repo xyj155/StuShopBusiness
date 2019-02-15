@@ -2,8 +2,8 @@ package com.example.stushopbusiness.base;
 
 public class BasePresenter<T extends BaseView> implements Presenter<T> {
 
-    protected T mMvpView;
 
+    protected T mMvpView;
 
     public BasePresenter(T mMvpView) {
         this.mMvpView = mMvpView;
