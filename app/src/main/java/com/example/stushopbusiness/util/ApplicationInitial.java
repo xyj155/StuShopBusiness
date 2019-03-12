@@ -1,8 +1,11 @@
 package com.example.stushopbusiness.util;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,7 +26,14 @@ import java.text.SimpleDateFormat;
 
 import cn.jpush.android.api.CustomPushNotificationBuilder;
 import cn.jpush.android.api.JPushInterface;
-import cn.jpush.im.android.api.JMessageClient;
+
+import io.rong.imkit.RongIM;
+import io.rong.imkit.fragment.ConversationListFragment;
+import io.rong.imlib.RongIMClient;
+import io.rong.push.RongPushClient;
+
+import static io.rong.eventbus.EventBus.TAG;
+import static io.rong.imkit.utils.SystemUtils.getCurProcessName;
 
 public class ApplicationInitial {
     public ApplicationInitial initArouter() {
@@ -39,6 +49,65 @@ public class ApplicationInitial {
         return this;
     }
 
+    public ApplicationInitial initRongIm() {
+        RongIM.init(MyApp.getInstance(), "0vnjpoad033gz");
+        connect((String) SharePreferenceUtil.getUser("imToken", "String"));
+        return this;
+    }
+
+
+    private void connect(String token) {
+
+        if (MyApp.getInstance().getApplicationInfo().packageName.equals(getCurProcessName(MyApp.getInstance()))) {
+
+            RongIM.connect(token, new RongIMClient.ConnectCallback() {
+
+                /**
+                 * Token 错误。可以从下面两点检查 1.  Token 是否过期，如果过期您需要向 App Server 重新请求一个新的 Token
+                 *                  2.  token 对应的 appKey 和工程里设置的 appKey 是否一致
+                 */
+                @Override
+                public void onTokenIncorrect() {
+                    Log.i(TAG, "onTokenIncorrect: ");
+                }
+
+                /**
+                 * 连接融云成功
+                 * @param userid 当前 token 对应的用户 id
+                 */
+                @Override
+                public void onSuccess(String userid) {
+                    Log.d("LoginActivity", "--onSuccess" + userid);
+//                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                    finish();
+                    Log.i(TAG, "onConnectSuccess: ");
+//                    ConversationListFragment listFragment = (ConversationListFragment) ConversationListFragment.instantiate(getContext(), ConversationListFragment.class.getName());
+//                    Uri uri = Uri.parse("rong://" + MyApp.getInstance().getApplicationInfo().packageName).buildUpon()
+//                            .appendPath("conversationlist")
+//                            .appendQueryParameter(RongPushClient.ConversationType.PRIVATE.getName(), "false")
+//                            .appendQueryParameter(RongPushClient.ConversationType.GROUP.getName(), "false")
+//                            .appendQueryParameter(RongPushClient.ConversationType.DISCUSSION.getName(), "false")
+//                            .appendQueryParameter(RongPushClient.ConversationType.PUBLIC_SERVICE.getName(), "false")
+//                            .appendQueryParameter(RongPushClient.ConversationType.SYSTEM.getName(), "false")
+//                            .build();
+//                    listFragment.setUri(uri);
+//                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+//                    //将融云的Fragment界面加入到我们的页面。
+//                    transaction.add(R.id.conversationlist, listFragment);
+//                    transaction.commitAllowingStateLoss();
+                }
+
+                /**
+                 * 连接融云失败
+                 * @param errorCode 错误码，可到官网 查看错误码对应的注释
+                 */
+                @Override
+                public void onError(RongIMClient.ErrorCode errorCode) {
+                    Log.i(TAG, "onError: "+errorCode);
+                }
+            });
+        }
+    }
     public ApplicationInitial initMob() {
 //        MobPush.addTags(java.lang.String[] tags);
         MobSDK.init(MyApp.getInstance(), "29cbff9d24b0b", "83fe8985b2647f0041f9cfb3487492d6");
@@ -126,15 +195,7 @@ public class ApplicationInitial {
         return sDateFormat.format(time);
     }
 
-    private static final String TAG = "ApplicationInitial";
-    public ApplicationInitial initIMClient() {
-        JMessageClient.setDebugMode(true);
-        JMessageClient.init(MyApp.getInstance(), true);
-        //注册全局事件监听类
-//        JMessageClient.registerEventReceiver(this);
 
-        return this;
-    }
 
 
     /**

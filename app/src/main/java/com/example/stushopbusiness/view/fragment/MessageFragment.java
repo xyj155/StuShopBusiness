@@ -1,8 +1,8 @@
 package com.example.stushopbusiness.view.fragment;
 
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,126 +10,95 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.example.stushopbusiness.R;
-import com.example.stushopbusiness.adapter.ConversationAdapter;
 import com.example.stushopbusiness.base.BaseFragment;
 import com.example.stushopbusiness.presenter.EmptyPresenter;
+import com.example.stushopbusiness.util.InRongIMConnect;
+import com.example.stushopbusiness.util.RongUtil;
 import com.example.stushopbusiness.util.RouterUtil;
 import com.example.stushopbusiness.util.SharePreferenceUtil;
-import com.example.stushopbusiness.weight.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.event.MessageEvent;
-import cn.jpush.im.android.api.model.Conversation;
-import cn.jpush.im.api.BasicCallback;
+import io.rong.imkit.RongIM;
+import io.rong.imkit.fragment.ConversationListFragment;
+import io.rong.imlib.model.UserInfo;
+import io.rong.push.RongPushClient;
+
 
 @Route(path = RouterUtil.Kind_Fragment_Main)
 public class MessageFragment extends BaseFragment<EmptyPresenter> {
-    @BindView(R.id.ry_recent)
-    RecyclerView ryRecent;
+
+
     @BindView(R.id.sml_message)
     SmartRefreshLayout smlMessage;
     Unbinder unbinder;
-    private ConversationAdapter conversationAdapter;
+
     @Override
     public void initData() {
 
     }
 
-    private static final String TAG = "MessageFragment";
-    @Override
-    public void onResume() {
-        super.onResume();
-//        JMessageClient.login(String.valueOf(SharePreferenceUtil.getUser("username", "String")), "xuyijie", new BasicCallback() {
-//            @Override
-//            public void gotResult(int i, String s) {
-//                Log.i(TAG, "gotResult: " + s);
-//                if (i == 0) {
-                    List<Conversation> conversationList = JMessageClient.getConversationList();
-                    if (conversationList!=null){
-                        Log.i(TAG, "gotResult: " + conversationList.size());
-                        conversationAdapter.replaceData(conversationList);
-                    }
-//                } else {
-//                    ToastUtils.show("消息列表获取失败，错误代码：" + i);
-//                    Log.i(TAG, "gotResult: 消息列表获取失败，错误代码");
-//                    smlMessage.finishRefresh();
-//                }
-//            }
-//        });
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        JMessageClient.unRegisterEventReceiver(this);
-    }
-    public void onEventMainThread(MessageEvent event) {
-        //do your own business
-        Log.i(TAG, "onEventMainThread: ");
-        List<Conversation> conversationList = JMessageClient.getConversationList();
-        if (conversationList != null) {
-            Log.i(TAG, "gotResult:conversationList " + conversationList.size());
-            if (conversationAdapter != null) {
-                conversationAdapter.replaceData(conversationList);
-                conversationAdapter.notifyDataSetChanged();
-            }
-        }
-    }
     @Override
     public void initView(View view) {
         unbinder = ButterKnife.bind(this, view);
-        ryRecent.setLayoutManager(new LinearLayoutManager(getContext()));
-        conversationAdapter = new ConversationAdapter(null);
-        ryRecent.setAdapter(conversationAdapter);
-        conversationAdapter.bindToRecyclerView(ryRecent);
-        View inflate = View.inflate(getContext(), R.layout.common_empty_message, null);
-        conversationAdapter.setEmptyView(inflate);
-        JMessageClient.registerEventReceiver(this);
-        JMessageClient.login(String.valueOf(SharePreferenceUtil.getUser("username", "String")), "xuyijie", new BasicCallback() {
-            @Override
-            public void gotResult(int i, String s) {
-                Log.i(TAG, "gotResult: " + s);
-                if (i == 0) {
-                    List<Conversation> conversationList = JMessageClient.getConversationList();
-                    Log.i(TAG, "gotResult: " + conversationList.size());
-                    conversationAdapter.replaceData(conversationList);
-                    smlMessage.finishRefresh();
-                } else {
-                    ToastUtils.show("消息列表获取失败，错误代码：" + i);
-                    Log.i(TAG, "gotResult: 消息列表获取失败，错误代码");
-                    smlMessage.finishRefresh();
-                }
-            }
-        });
         smlMessage.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshLayout) {
-                JMessageClient.login(String.valueOf(SharePreferenceUtil.getUser("username", "String")), "xuyijie", new BasicCallback() {
-                    @Override
-                    public void gotResult(int i, String s) {
-                        Log.i(TAG, "gotResult: " + s);
-                        if (i == 0) {
-                            List<Conversation> conversationList = JMessageClient.getConversationList();
-                            Log.i(TAG, "gotResult: " + conversationList.size());
-                            conversationAdapter.replaceData(conversationList);
-                            smlMessage.finishRefresh();
-                        } else {
-                            ToastUtils.show("消息列表获取失败，错误代码：" + i);
-                            Log.i(TAG, "gotResult: 消息列表获取失败，错误代码");
-                            smlMessage.finishRefresh();
-                        }
-                    }
-                });
+                initRongFragment();
+            }
+        });
+        initRongFragment();
+    }
+
+    private void initRongFragment() {
+
+        Log.i(TAG, "initRongFragment: " + (String) SharePreferenceUtil.getUser("imToken", "String"));
+        RongUtil.connect((String) SharePreferenceUtil.getUser("imToken", "String"), new InRongIMConnect() {
+            @Override
+            public void onConnectSuccess() {
+                RongIM.getInstance().setMessageAttachedUserInfo(true);
+                Log.i(TAG, "onConnectSuccess: ");
+                ConversationListFragment listFragment = (ConversationListFragment) ConversationListFragment.instantiate(getContext(), ConversationListFragment.class.getName());
+                Uri uri = Uri.parse("rong://" + getActivity().getApplicationInfo().packageName).buildUpon()
+                        .appendPath("conversationlist")
+                        .appendQueryParameter(RongPushClient.ConversationType.PRIVATE.getName(), "false")
+                        .appendQueryParameter(RongPushClient.ConversationType.GROUP.getName(), "false")
+                        .appendQueryParameter(RongPushClient.ConversationType.DISCUSSION.getName(), "false")
+                        .appendQueryParameter(RongPushClient.ConversationType.PUBLIC_SERVICE.getName(), "false")
+                        .appendQueryParameter(RongPushClient.ConversationType.SYSTEM.getName(), "false")
+                        .build();
+                listFragment.setUri(uri);
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                //将融云的Fragment界面加入到我们的页面。
+                transaction.add(R.id.conversationlist, listFragment);
+                transaction.commitAllowingStateLoss();
+            }
+
+            @Override
+            public void onConnectFailed() {
+                Log.i(TAG, "onConnectFailed: ");
             }
         });
     }
+
+    private static final String TAG = "MessageFragment";
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
+
 
     @Override
     public int initLayout() {
@@ -146,8 +115,12 @@ public class MessageFragment extends BaseFragment<EmptyPresenter> {
         // TODO: inflate a fragment view
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
+
         return rootView;
     }
+
+
+
 
     @Override
     public void onDestroyView() {

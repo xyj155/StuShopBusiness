@@ -1,1 +1,1 @@
-include ':app', ':pictureSelector'
+include ':app', ':pictureSelector', ':IMKit', ':IMLib', ':RCSticker'

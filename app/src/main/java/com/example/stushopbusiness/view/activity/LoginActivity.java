@@ -109,6 +109,7 @@ public class LoginActivity extends BaseActivity<LoginContract.View, LoginPresent
         user.put("userId", String.valueOf(userGson.getId()));
         user.put("owner", userGson.getShopOwner());
         user.put("city", userGson.getShopOwnerCity());
+        user.put("imToken", userGson.getImToken());
         user.put("login", true);
         SharePreferenceUtil.saveUser(user);
         startActivity(MainActivity.class);

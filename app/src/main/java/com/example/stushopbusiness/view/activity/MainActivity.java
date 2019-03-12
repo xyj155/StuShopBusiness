@@ -17,6 +17,7 @@ import com.example.stushopbusiness.contract.EmptyContract;
 import com.example.stushopbusiness.presenter.EmptyPresenter;
 import com.example.stushopbusiness.util.RouterUtil;
 import com.example.stushopbusiness.view.fragment.HomeFragment;
+import com.example.stushopbusiness.view.fragment.MessageFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,7 +76,7 @@ public class MainActivity extends BaseActivity<EmptyContract.View, EmptyPresente
                         break;
                     case R.id.rb_resource:
                         if (messageFragment == null) {
-                            messageFragment = (Fragment) ARouter.getInstance().build(RouterUtil.Kind_Fragment_Main).navigation();
+                            messageFragment = new MessageFragment();
                             transaction.add(R.id.flContainer, messageFragment);
                         } else {
                             transaction.show(messageFragment);
